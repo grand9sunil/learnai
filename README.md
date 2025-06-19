@@ -62,3 +62,9 @@ https://brainrotbackground.s3.amazonaws.com/TRUCK-6.mp4
 https://brainrotbackground.s3.amazonaws.com/TRUCK-7.mp4
 https://brainrotbackground.s3.amazonaws.com/TRUCK-8.mp4
 https://brainrotbackground.s3.amazonaws.com/TRUCK-9.mp4
+
+### NSE Live Stock Tracking
+
+Run `npm run nse:live -- <SYMBOL>` to watch live prices from the NSE website.
+The script prints the latest price to the console every five seconds.
+
