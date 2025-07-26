@@ -13,9 +13,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.554.0",
-    "@react-three/drei": "^9.96.1",
-    "@react-three/fiber": "^8.15.14",
-    "three": "^0.161.0",
     "@clerk/nextjs": "4.30.0",
     "@clerk/themes": "^1.7.7",
     "@hookform/resolvers": "^3.3.2",

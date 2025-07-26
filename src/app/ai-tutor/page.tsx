@@ -137,19 +137,19 @@ export default function AITutorPage() {
     }
   }, [isListening]);
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-96">
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              Please sign in to use the AI Tutor
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // if (!user) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen">
+  //       <Card className="w-96">
+  //         <CardContent className="pt-6">
+  //           <p className="text-center text-muted-foreground">
+  //             Please sign in to use the AI Tutor
+  //           </p>
+  //         </CardContent>
+  //       </Card>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">

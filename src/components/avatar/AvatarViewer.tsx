@@ -1,97 +1,12 @@
 "use client";
 
 import { Suspense, useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, Environment, Center } from '@react-three/drei';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import * as THREE from 'three';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Bot } from 'lucide-react';
 
-interface AvatarModelProps {
-  url: string;
+interface AvatarViewerProps {
+  avatarUrl: string;
   isAnimating: boolean;
   currentMessage?: string;
-}
-
-function AvatarModel({ url, isAnimating, currentMessage }: AvatarModelProps) {
-  const meshRef = useRef<THREE.Group>(null);
-  const mixerRef = useRef<THREE.AnimationMixer | null>(null);
-  const gltf = useLoader(GLTFLoader, url);
-  const [animations, setAnimations] = useState<THREE.AnimationClip[]>([]);
-
-  useEffect(() => {
-    if (gltf && gltf.animations.length > 0) {
-      setAnimations(gltf.animations);
-      
-      // Setup animation mixer
-      if (meshRef.current) {
-        mixerRef.current = new THREE.AnimationMixer(meshRef.current);
-        
-        // Play idle animation if available
-        const idleAnimation = gltf.animations.find(clip => 
-          clip.name.toLowerCase().includes('idle') || 
-          clip.name.toLowerCase().includes('breathing')
-        );
-        
-        if (idleAnimation) {
-          const action = mixerRef.current.clipAction(idleAnimation);
-          action.play();
-        }
-      }
-    }
-
-    return () => {
-      if (mixerRef.current) {
-        mixerRef.current.stopAllAction();
-      }
-    };
-  }, [gltf]);
-
-  useEffect(() => {
-    if (isAnimating && mixerRef.current && gltf.animations.length > 0) {
-      // Trigger talking animation
-      const talkAnimation = gltf.animations.find(clip => 
-        clip.name.toLowerCase().includes('talk') || 
-        clip.name.toLowerCase().includes('speak')
-      );
-      
-      if (talkAnimation) {
-        const action = mixerRef.current.clipAction(talkAnimation);
-        action.reset().fadeIn(0.2).play();
-        
-        // Stop talking animation after message duration
-        setTimeout(() => {
-          action.fadeOut(0.2);
-        }, (currentMessage?.length || 0) * 100); // Rough estimate based on message length
-      }
-    }
-  }, [isAnimating, currentMessage, gltf.animations]);
-
-  useFrame((state, delta) => {
-    if (mixerRef.current) {
-      mixerRef.current.update(delta);
-    }
-    
-    // Subtle head movement
-    if (meshRef.current) {
-      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.1;
-      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.2) * 0.05;
-    }
-  });
-
-  // Scale and position the model appropriately
-  const scale = 1.5;
-  
-  return (
-    <Center>
-      <primitive 
-        ref={meshRef}
-        object={gltf.scene} 
-        scale={scale}
-        position={[0, -1, 0]}
-      />
-    </Center>
-  );
 }
 
 function LoadingSpinner() {
@@ -105,64 +20,67 @@ function LoadingSpinner() {
   );
 }
 
-interface AvatarViewerProps {
-  avatarUrl: string;
-  isAnimating: boolean;
-  currentMessage?: string;
-}
-
 export default function AvatarViewer({ avatarUrl, isAnimating, currentMessage }: AvatarViewerProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [avatarUrl]);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (hasError) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground mb-2">Failed to load 3D avatar</p>
+          <p className="text-xs text-muted-foreground">Using fallback display</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-full relative">
-      <Canvas
-        camera={{ 
-          position: [0, 1, 3], 
-          fov: 75,
-          near: 0.1,
-          far: 1000 
-        }}
-        shadows
-        dpr={[1, 2]}
-      >
-        <Suspense fallback={null}>
-          {/* Lighting */}
-          <ambientLight intensity={0.6} />
-          <directionalLight 
-            position={[10, 10, 5]} 
-            intensity={1} 
-            castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
-          />
-          <pointLight position={[-10, -10, -10]} intensity={0.5} />
-          
-          {/* Environment */}
-          <Environment preset="studio" />
-          
-          {/* Avatar Model */}
-          <AvatarModel 
-            url={avatarUrl} 
-            isAnimating={isAnimating}
-            currentMessage={currentMessage}
-          />
-          
-          {/* Controls */}
-          <OrbitControls 
-            enablePan={false}
-            enableZoom={true}
-            enableRotate={true}
-            minDistance={2}
-            maxDistance={10}
-            minPolarAngle={Math.PI / 4}
-            maxPolarAngle={Math.PI - Math.PI / 4}
-          />
-        </Suspense>
-      </Canvas>
+    <div className="w-full h-full relative flex items-center justify-center bg-gradient-to-br from-background to-muted">
+      {/* Fallback Avatar Display */}
+      <div className="text-center">
+        <div className={`relative ${isAnimating ? 'animate-pulse' : ''}`}>
+          <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+            <Bot className="h-16 w-16 text-white" />
+          </div>
+          {isAnimating && (
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-100"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-200"></div>
+              </div>
+            </div>
+          )}
+        </div>
+        <p className="text-lg font-semibold">AI Tutor</p>
+        <p className="text-sm text-muted-foreground">Ready to help you learn!</p>
+        {currentMessage && isAnimating && (
+          <div className="mt-4 p-2 bg-muted rounded-lg max-w-xs">
+            <p className="text-xs text-muted-foreground">Currently saying:</p>
+            <p className="text-sm">{currentMessage.slice(0, 50)}{currentMessage.length > 50 ? '...' : ''}</p>
+          </div>
+        )}
+      </div>
       
-      {/* Loading overlay */}
-      <Suspense fallback={<LoadingSpinner />}>
-        <div></div>
-      </Suspense>
+      {/* Note about 3D Avatar */}
+      <div className="absolute bottom-4 right-4 text-xs text-muted-foreground bg-background/80 p-2 rounded">
+        <p>3D Avatar: {avatarUrl ? 'Uploaded' : 'Not uploaded'}</p>
+        <p className="text-[10px]">Full 3D rendering coming soon</p>
+      </div>
     </div>
   );
 }
