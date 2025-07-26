@@ -19,6 +19,7 @@ import {
   StarIcon,
   Wand,
   X,
+  Bot,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -281,6 +282,14 @@ export default function Home({
             >
               <Wand className="h-4 w-4" /> Create Video
             </Button>
+            <Link href="/ai-tutor">
+              <Button
+                className="flex flex-row items-center gap-2 w-full"
+                variant={"outline"}
+              >
+                <Bot className="h-4 w-4" /> AI Tutor
+              </Button>
+            </Link>
             {pendingVideo && placeInQueue > 5 && progress === 0 ? (
               <Button
                 className="flex flex-row items-center gap-2 border border-red-500/60 bg-red-500/20"

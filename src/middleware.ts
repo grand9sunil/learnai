@@ -4,6 +4,8 @@ import { authMiddleware } from "@clerk/nextjs";
 export default authMiddleware({
   publicRoutes: [
     "/",
+    "/ai-tutor-demo",
+    "/ai-tutor-demo.html",
     "/api/create",
     "/api/trpc/user.videoStatus",
     "/api/trpc/user.user",
